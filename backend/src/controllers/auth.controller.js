@@ -18,9 +18,8 @@ export const signup = async (req, res) => {
 
 		const user = await User.findOne({ email });
 
-		if (user) {
+		if (user)
 			return res.status(400).json({ message: "Email already exists" });
-		}
 
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
