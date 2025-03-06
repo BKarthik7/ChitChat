@@ -1,13 +1,10 @@
-import { useState } from 'react'
-import './App.css'
+import React from 'react'
 
-function App() {
+const App = () => {
   return (
-    <>
-      <div className="flex justify-center items-center h-screen">
-        Hello World!
-      </div>
-    </>
+    <div>
+      Hello
+    </div>
   )
 }
 
