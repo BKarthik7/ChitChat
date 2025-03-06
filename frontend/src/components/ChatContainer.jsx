@@ -1,11 +1,11 @@
-import { useChatStore } from "../store/useChatStore";
-import { useEffect, useRef } from "react";
+import {useChatStore} from "../store/useChatStore";
+import {useEffect, useRef} from "react";
 
 import ChatHeader from "./ChatHeader";
 import MessageInput from "./MessageInput";
 import MessageSkeleton from "./skeletons/MessageSkeleton";
-import { useAuthStore } from "../store/useAuthStore";
-import { formatMessageTime } from "../lib/utils";
+import {useAuthStore} from "../store/useAuthStore";
+import {formatMessageTime} from "../lib/utils";
 
 const ChatContainer = () => {
   const {
@@ -16,7 +16,7 @@ const ChatContainer = () => {
     subscribeToMessages,
     unsubscribeFromMessages,
   } = useChatStore();
-  const { authUser } = useAuthStore();
+  const {authUser} = useAuthStore();
   const messageEndRef = useRef(null);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ const ChatContainer = () => {
 
   useEffect(() => {
     if (messageEndRef.current && messages) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+      messageEndRef.current.scrollIntoView({behavior: "smooth"});
     }
   }, [messages]);
 
@@ -59,8 +59,8 @@ const ChatContainer = () => {
                 <img
                   src={
                     message.senderId === authUser._id
-                      ? authUser.profilePic || "/avatar.png"
-                      : selectedUser.profilePic || "/avatar.png"
+                      ? authUser.profilePics || "/avatar.png"
+                      : selectedUser.profilePics || "/avatar.png"
                   }
                   alt="profile pic"
                 />
