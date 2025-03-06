@@ -1,4 +1,4 @@
-# ✨ Realtime Chat App ✨
+# ✨ ChitChat - Realtime Chat App ✨
 
 Highlights:
 
