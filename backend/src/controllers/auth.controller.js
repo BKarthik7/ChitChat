@@ -1,52 +1,53 @@
 import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
+import cloudinary from "../lib/cloudinary.js";
 
 export const signup = async (req, res) => {
-	const { email, fullName, password } = req.body;
+	const { fullName, email, password } = req.body;
 	try {
-		if (!email || !fullName || !password) {
-			return res.status(400).send({
-				message: "Please fill all fields",
-			});
+		if (!fullName || !email || !password) {
+			return res.status(400).json({ message: "All fields are required" });
 		}
 
 		if (password.length < 6) {
-			return res.status(400).send({
-				message: "Password must be at least 6 characters",
-			});
+			return res
+				.status(400)
+				.json({ message: "Password must be at least 6 characters" });
 		}
 
 		const user = await User.findOne({ email });
 
 		if (user) {
-			return res.status(400).send({ message: "User already exists" });
+			return res.status(400).json({ message: "Email already exists" });
 		}
 
 		const salt = await bcrypt.genSalt(10);
 		const hashedPassword = await bcrypt.hash(password, salt);
 
 		const newUser = new User({
-			email,
 			fullName,
+			email,
 			password: hashedPassword,
 		});
 
 		if (newUser) {
+			// generate jwt token here
 			generateToken(newUser._id, res);
 			await newUser.save();
+
 			res.status(201).json({
 				_id: newUser._id,
-				email: newUser.email,
 				fullName: newUser.fullName,
-				profilePicture: newUser.profilePicture,
+				email: newUser.email,
+				profilePic: newUser.profilePic,
 			});
 		} else {
-			res.status(400).send({ message: "Invalid user data" });
+			res.status(400).json({ message: "Invalid user data" });
 		}
 	} catch (error) {
-		console.log("Error in signup Controller", error);
-		res.status(500).send({ message: "Internal Server Error" });
+		console.log("Error in signup controller", error.message);
+		res.status(500).json({ message: "Internal Server Error" });
 	}
 };
 
@@ -54,28 +55,36 @@ export const login = async (req, res) => {
 	const { email, password } = req.body;
 	try {
 		const user = await User.findOne({ email });
+
 		if (!user) {
-			return res.status(400).send({ message: "Invalid credentials" });
+			return res.status(400).json({ message: "Invalid credentials" });
 		}
 
 		const isPasswordCorrect = await bcrypt.compare(password, user.password);
 		if (!isPasswordCorrect) {
-			return res.status(400).send({ message: "Invalid credentials" });
+			return res.status(400).json({ message: "Invalid credentials" });
 		}
 
 		generateToken(user._id, res);
+
 		res.status(200).json({
 			_id: user._id,
-			email: user.email,
 			fullName: user.fullName,
-			profilePicture: user.profilePicture,
+			email: user.email,
+			profilePic: user.profilePic,
 		});
 	} catch (error) {
-		console.log("Error in login Controller", error);
-		res.status(500).send({ message: "Internal Server Error" });
+		console.log("Error in login controller", error.message);
+		res.status(500).json({ message: "Internal Server Error" });
 	}
 };
 
 export const logout = (req, res) => {
-	res.send("Logout route");
+	try {
+		res.cookie("jwt", "", { maxAge: 0 });
+		res.status(200).json({ message: "Logged out successfully" });
+	} catch (error) {
+		console.log("Error in logout controller", error.message);
+		res.status(500).json({ message: "Internal Server Error" });
+	}
 };
